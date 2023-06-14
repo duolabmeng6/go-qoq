@@ -62,3 +62,9 @@ https://www.icloud.com/shortcuts/776f8a1d8e43471885e8a505eb9a9deb
 
 
 ![image-20230615073755854](images/README/image-20230615073755854.png)
+
+
+
+## 声明
+
+qoq 为 [GPL-3.0](https://github.com/tisfeng/Easydict/blob/main/LICENSE) 开源协议，仅供学习交流，任何人都可以免费获取该产品和源代码。如果你认为您的合法权益受到侵犯，请立即联系[作者](https://github.com/duolabmeng6)。你可以自由使用源代码，但必须附上相应的许可证和版权声明。
