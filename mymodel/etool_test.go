@@ -39,7 +39,7 @@ func Test取配置文件(t *testing.T) {
 	//eco
 	// json 格式化
 
-	ecore.E调试输出(etool.Json美化(GConfig.E默认翻译服务列表))
+	ecore.E调试输出(etool.Json美化(GConfig))
 
 	//ecore.E调试输出(GConfig.E默认翻译服务列表)
 

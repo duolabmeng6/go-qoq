@@ -43,14 +43,6 @@
       "order": 3
     },
     {
-      "logo": "/images/Google Translate.png",
-      "name": "谷歌翻译",
-      "app_id": "",
-      "secret_key": "",
-      "enable": false,
-      "order": 4
-    },
-    {
       "logo": "/images/Apple Translate.png",
       "name": "阿里云翻译",
       "app_id": "",

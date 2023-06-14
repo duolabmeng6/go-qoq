@@ -149,7 +149,7 @@ func E加载配置文件(dir string) bool {
 	err = viper.ReadInConfig()
 	if err != nil {
 		fmt.Println("读取配置文件失败", err)
-		return false
+		//return false
 	}
 
 	err = viper.Unmarshal(&GConfig)
