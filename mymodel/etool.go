@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 )
 
 func SystemScreenshot() string {
@@ -36,9 +37,13 @@ func SystemScreenshot() string {
 
 func MacOcr(图片路径 string) string {
 	// 调用 ./llocr 图片路径 获取结果
-	cmd := exec.Command("./llocr", 图片路径)
+	运行目录 := ecore.E取运行目录()
+	fmt.Println("图像OCR", 运行目录)
+
+	cmd := exec.Command(运行目录+"/llocr", 图片路径)
 	out, err := cmd.Output()
 	if err != nil {
+		fmt.Println("图像OCR错误", err)
 		return ""
 	}
 	return string(out)
@@ -131,6 +136,11 @@ type GConfig翻译服务列表 struct {
 var G翻译接口 *etranslation.E翻译
 
 func E加载配置文件(dir string) bool {
+	fmt.Println("运行目录", ecore.E取运行目录())
+	if dir == "./" {
+		dir = ecore.E取运行目录()
+
+	}
 	defaultFile := dir + "/default_config.json"
 	viper.SetConfigType("json")
 	viper.SetConfigFile(defaultFile)
@@ -238,4 +248,22 @@ func Say(txt string) {
 		fmt.Println("执行AppleScript时出错:", err)
 	}
 
+}
+
+func OpenURL(url string) error {
+	var cmd string
+	var args []string
+
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = "open"
+		args = []string{url}
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start", url}
+	default:
+		return fmt.Errorf("unsupported platform")
+	}
+
+	return exec.Command(cmd, args...).Start()
 }

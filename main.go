@@ -32,6 +32,15 @@ var AppData struct {
 }
 
 func main() {
+	if !ecore.E文件是否存在(ecore.E取运行目录() + "/default_config.json") {
+		字节集, _ := assets.ReadFile("assets/config/default_config.json")
+		ecore.E写到文件(ecore.E取运行目录()+"/default_config.json", 字节集)
+	}
+	if !ecore.E文件是否存在(ecore.E取运行目录() + "/llocr") {
+		字节集, _ := assets.ReadFile("assets/config/llocr")
+		ecore.E写到文件(ecore.E取运行目录()+"/llocr", 字节集)
+	}
+
 	if mymodel.E加载配置文件("./") == false {
 		panic("加载配置文件失败")
 	}
@@ -247,7 +256,8 @@ func main() {
 			})
 		}
 		if action == "操作_保存配置" {
-			ecore.E写到文件("user_config.json", []byte(data))
+			运行目录 := ecore.E取运行目录()
+			ecore.E写到文件(运行目录+"/user_config.json", []byte(data))
 			window_set.Hide()
 
 			//重新加载配置
@@ -382,6 +392,7 @@ func main() {
 	})
 	myMenu.Add("检查更新").OnClick(func(ctx *application.Context) {
 		println("检查更新")
+		mymodel.OpenURL("https://github.com/duolabmeng6/go-qoq")
 	})
 	myMenu.AddSeparator()
 
