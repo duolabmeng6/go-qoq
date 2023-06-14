@@ -1,0 +1,195 @@
+html {
+  background-color: rgba(255, 255, 255, 1);
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  user-select: none;
+}
+.selectable {
+  -webkit-user-select: text; /* Safari */
+  -moz-user-select: text; /* Firefox */
+  -ms-user-select: text; /* IE/Edge */
+  user-select: text;
+}
+
+#app {
+  overflow: hidden;
+}
+
+.ico-btn {
+  padding: 2px;
+  user-select: none;
+}
+
+.ico-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ico-btn:hover {
+  background: #e7e7e7;
+  border-radius: 4px;
+}
+
+.ico-btn:focus,
+.ico-btn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.ico-btn-click {
+  transform: rotate(0);
+  background: #f4f4f4;
+  animation-name: rotate-animation;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes rotate-animation {
+  100% {
+    transform: rotate(-45deg);
+  }
+}
+
+.ico-btn-reset {
+  transform: rotate(-45deg);
+  animation-name: rotate-animation-reset;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes rotate-animation-reset {
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.ico-btn2 {
+  padding: 2px;
+  user-select: none;
+}
+
+.ico-btn2 svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ico-jiaobiao-active {
+  transform: rotate(-90deg);
+}
+
+/* 定义滚动条样式 */
+/* Firefox */
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(193, 193, 193) #fff;
+}
+
+/* WebKit */
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* 定义滚动条滑块样式 */
+/* Firefox */
+.scrollbar-thumb {
+  background-color: rgb(193, 193, 193);
+  border-radius: 10px;
+}
+
+/* WebKit */
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(193, 193, 193);
+  border-radius: 10px;
+}
+
+/* 定义滚动条轨道样式 */
+/* Firefox */
+.scrollbar-track {
+  background-color: #fff;
+}
+
+/* WebKit */
+.scrollbar::-webkit-scrollbar-track {
+  background-color: #fff;
+}
+
+
+select {
+  appearance: none;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#tab-1:checked ~ .nav label[for="tab-1"] div {
+  background-color: rgb(238, 238, 238);
+}
+
+#tab-2:checked ~ .nav label[for="tab-2"] div {
+  background-color: rgb(238, 238, 238);
+}
+
+#tab-3:checked ~ .nav label[for="tab-3"] div {
+  background-color: rgb(238, 238, 238);
+}
+
+#tab-4:checked ~ .nav label[for="tab-4"] div {
+  background-color: rgb(238, 238, 238);
+}
+
+#tab-1:checked ~ .tab-tab-1 {
+  @apply flex;
+}
+#tab-2:checked ~ .tab-tab-2 {
+  @apply flex;
+}
+#tab-3:checked ~ .tab-tab-3 {
+  @apply flex;
+}
+#tab-4:checked ~ .tab-tab-4 {
+  @apply flex;
+}
+
+.tab {
+  padding-top: 120px;
+}
+
+.toolbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 64px; /* 正方形宽度 */
+  height: 64px; /* 正方形高度 */
+  background-color: rgb(251, 251, 251);
+  border-radius: 4px;
+}
+
+.toolbar-item i {
+  font-size: 24px; /* 调整图标大小 */
+  line-height: 1; /* 减少行高 */
+  margin-bottom: 0.25rem;
+  color: rgb(69, 148, 213); /* 浅蓝色 */
+}
+
+.toolbar-item span {
+  font-size: 12px; /* 调整文字大小 */
+  text-align: center;
+  color: rgb(113, 113, 113);
+  line-height: 1; /* 减少行高 */
+}
+
+.toolbar-item.active {
+  background-color: rgb(238, 238, 238);
+}
+
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
