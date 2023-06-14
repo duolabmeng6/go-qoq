@@ -193,6 +193,7 @@ func E加载配置文件(dir string) bool {
 			Order:  0,
 			Logo:   "",
 			Params: v.Params,
+			Enable: ecore.E判断文本(v.Name, "免费"),
 		})
 	}
 
