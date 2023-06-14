@@ -12,7 +12,7 @@
 
 - [x] qoq翻译 macOS 系统核心功能完成
 - [ ] macOS 打包为应用 待完成
-- [ ] Window 待开发
+- [ ] Window go-qoq 待开发 目前有qt6开发的 [window版本 qoq](https://github.com/duolabmeng6/qoq)
 
 
 
