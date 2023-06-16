@@ -359,7 +359,7 @@ func main() {
 	}
 
 	myMenu := app.NewMenu()
-	myMenu.Add("qoq 1.0.1").OnClick(func(ctx *application.Context) {
+	myMenu.Add("qoq " + mymodel.Version).OnClick(func(ctx *application.Context) {
 		println("Hello World!")
 	})
 	myMenu.Add("输入翻译").OnClick(func(ctx *application.Context) {

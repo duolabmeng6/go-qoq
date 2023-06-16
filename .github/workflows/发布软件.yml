@@ -30,7 +30,7 @@ jobs:
 
   jobs_macos:
     needs: [ jobs_v ]
-    name: 构建window软件
+    name: 构建macos软件
     runs-on: macos-12
     env:
       version: ${{ needs.jobs_v.outputs.version }}
@@ -57,6 +57,10 @@ jobs:
           go install
           wails
           cd ../../../..
+      - name: 生成 Version.go 文件
+        run: |
+          echo "${{ format('package mymodel\n\nvar Version = `{0}`', env.version) }}" > mymodel/Version.go
+          cat mymodel/Version.go
       - name: 编译
         run: |
           pwd
