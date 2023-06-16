@@ -5,47 +5,75 @@ on:
 
 
 jobs:
-  greet:
+  jobs_v:
+    name: 构建版本号和变更信息
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.create_version.outputs.tag_name }} # 版本号
+      body: ${{ steps.create_version.outputs.body }} # 版本变更内容
     steps:
-    - name: Send greeting
-      run: echo "Hello"
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: 查看文件
-      run: |
-        pwd
-        ls -la
-    - name: 安装go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '^1.20.5' # The Go version to download (if necessary) and use.
-        cache-dependency-path: go.sum
-        go-version-file: 'go.mod'
-    - name: 查看版本
-      run: go version
-    - name: 安装 wails 工具
-      run: |
-        cd wails/v3/cmd/wails
-        go install
-        wails
-        cd ../../../..
-    - name: 编译测试
-#      run: GOOS=darwin GOARCH=amd64 go build -gcflags=all="-N -l" -o main2 main.go
-      run: |
-        pwd
-        wails task package:darwin
-        ls -la
-    - name: 查看编译的文件
-      run: |
-        ls -la
-    - name: 保存 main2
-      run: |
-        mkdir -p /tmp/artifacts
-        cp -r bin/qoq.app /tmp/artifacts/qoq.app
+      - uses: release-drafter/release-drafter@v5
+        id: create_version
+        with:
+          config-name: release-drafter.yml # 配置文件在 .github/release-drafter.yml
+          disable-autolabeler: false # 禁止自动标签
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 查看变量
+        run: |
+          echo ${{ format('version={0}', steps.create_version.outputs.tag_name ) }} 
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: my-artifact
-        path: /tmp/artifacts/
+
+  jobs_macos:
+    needs: [ jobs_v ]
+    name: 构建macos软件
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.jobs_v.outputs.version }}
+      body: ${{ needs.jobs_v.outputs.body }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: 查看文件
+        run: |
+          pwd
+          ls -la
+      - name: 安装 go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '^1.20.5'
+          cache-dependency-path: |
+            **/go.sum
+            **/go.mod
+          go-version-file: 'go.mod'
+      - run: go version
+      - name: 安装 wails 工具
+        run: |
+          cd wails/v3/cmd/wails
+          go install
+          wails
+          cd ../../../..
+      - name: 生成 Version.go 文件
+        run: |
+          echo "package mymodel\n\nvar Version = `${{ env.version }}`" > mymodel/Version.go
+          cat mymodel/Version.go
+      - name: 编译
+        run: |
+          pwd
+          wails task package:darwin
+          ls -la
+      - name: 查看编译的文件保存
+        run: |
+          ls -la
+          mkdir -p /tmp/artifacts
+          cp -r bin/qoq.app /tmp/artifacts/qoq.app
+          chmod +x /tmp/artifacts/qoq.app/Contents/MacOS/qoq
+      - name: 创建压缩包
+        run: |
+          cd /tmp/artifacts/
+          zip -r ./qoq_MacOS.zip ./qoq.app
+      - name: 上传产物
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos
+          path: /tmp/artifacts/*.zip
