@@ -243,7 +243,7 @@
                 console.log("restRect")
                 this.$nextTick(() => {
                     this.内容的高度 = document.getElementById('app').clientHeight;
-                    PyAction("操作_内容高度", this.内容的高度, function (data) {
+                    PyAction("操作_内容高度", this.内容的高度+12, function (data) {
 
                     })
                 });

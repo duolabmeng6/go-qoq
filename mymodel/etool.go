@@ -181,6 +181,7 @@ func E加载配置文件(dir string) bool {
 	G翻译接口.E注册服务("火山翻译", etranslation.New火山翻译(ecore.Env("火山翻译_App_id", ""), ecore.Env("火山翻译_Secret_key", "")))
 	G翻译接口.E注册服务("腾讯翻译", etranslation.New腾讯翻译(ecore.Env("腾讯翻译_App_id", ""), ecore.Env("腾讯翻译_Secret_key", "")))
 	G翻译接口.E注册服务("阿里云翻译", etranslation.New阿里云翻译(ecore.Env("阿里云翻译_App_id", ""), ecore.Env("阿里云翻译_Secret_key", "")))
+	G翻译接口.E注册服务("DeepL翻译", etranslation.NewDeepL翻译(ecore.Env("DeepL翻译_App_id", "")))
 
 	// 遍历 G翻译接口.E列出翻译模块() 把他加入 GConfig.E翻译服务列表
 	for _, v := range G翻译接口.E列出翻译模块和初始化参数() {
@@ -209,6 +210,9 @@ func E加载配置文件(dir string) bool {
 
 	// 遍历 E默认翻译服务列表 把用户的配置覆盖上去
 	for i, v := range GConfig.E默认翻译服务列表 {
+		if v.Logo == "" {
+			GConfig.E默认翻译服务列表[i].Logo = "/images/appicon.png"
+		}
 		for _, v2 := range GConfig.E翻译服务列表 {
 			if v.Name == v2.Name {
 				GConfig.E默认翻译服务列表[i].App_id = v2.App_id
@@ -221,6 +225,7 @@ func E加载配置文件(dir string) bool {
 				ecore.E写环境变量(v.Name+"_App_id", v2.App_id)
 				ecore.E写环境变量(v.Name+"_Secret_key", v2.Secret_key)
 			}
+
 		}
 	}
 
@@ -230,6 +235,7 @@ func E加载配置文件(dir string) bool {
 	G翻译接口.E注册服务("火山翻译", etranslation.New火山翻译(ecore.Env("火山翻译_App_id", ""), ecore.Env("火山翻译_Secret_key", "")))
 	G翻译接口.E注册服务("腾讯翻译", etranslation.New腾讯翻译(ecore.Env("腾讯翻译_App_id", ""), ecore.Env("腾讯翻译_Secret_key", "")))
 	G翻译接口.E注册服务("阿里云翻译", etranslation.New阿里云翻译(ecore.Env("阿里云翻译_App_id", ""), ecore.Env("阿里云翻译_Secret_key", "")))
+	G翻译接口.E注册服务("DeepL翻译", etranslation.NewDeepL翻译(ecore.Env("DeepL翻译_App_id", "")))
 
 	//c := viper.AllSettings()
 	//ecore.E调试输出(c)

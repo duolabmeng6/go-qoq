@@ -9,7 +9,7 @@ replace github.com/wailsapp/wails/v2 => /Users/chensuilong/Desktop/goproject/wai
 replace github.com/duolabmeng6/goefun => /Users/chensuilong/Desktop/goproject/goefun
 
 require (
-	github.com/duolabmeng6/goefun v1.2.3
+	github.com/duolabmeng6/goefun v1.3.0
 	github.com/go-vgo/robotgo v0.100.10
 	github.com/robotn/gohook v0.31.3
 	github.com/spf13/viper v1.16.0
@@ -83,7 +83,7 @@ require (
 	github.com/volcengine/volc-sdk-golang v1.0.103 // indirect
 	github.com/wailsapp/go-webview2 v1.0.2-0.20230604075323-d593c659ca7b // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	github.com/wailsapp/wails/v2 v2.3.2-0.20230117193915-45c3a501d9e6 // indirect
+	github.com/wailsapp/wails/v2 v2.5.1 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
 	golang.org/x/exp v0.0.0-20220930202632-ec3f01382ef9 // indirect

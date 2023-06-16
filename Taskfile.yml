@@ -14,26 +14,26 @@ tasks:
       - darwin
     cmds:
       - task: pre-build
-      - go build -gcflags=all="-N -l" -o bin/testapp
+      - go build -gcflags=all="-N -l" -o bin/qoq
       - task: post-build
     env:
       CGO_CFLAGS: "-mmacosx-version-min=10.13"
       CGO_LDFLAGS: "-mmacosx-version-min=10.13"
 
-  build:windows:
-    summary: Builds the application for Windows
-    platforms:
-      - windows
-    cmds:
-      - task: pre-build
-      - go build -gcflags=all="-N -l" -o bin/testapp.exe
-      - task: post-build
+#  build:windows:
+#    summary: Builds the application for Windows
+#    platforms:
+#      - windows
+#    cmds:
+#      - task: pre-build
+#      - go build -gcflags=all="-N -l" -o bin/qoq.exe
+#      - task: post-build
 
   build:
     summary: Builds the application
     cmds:
       - task: build:darwin
-      - task: build:windows
+#      - task: build:windows
 
   generate-icons:
     summary: Generates Windows `.ico` and Mac `.icns` files from an image
@@ -45,7 +45,7 @@ tasks:
   build-prod:
     summary: Creates a production build of the application
     cmds:
-      - go build -tags production -ldflags="-w -s" -o bin/testapp{{exeExt}}
+      - go build -tags production -ldflags="-w -s" -o bin/qoq{{exeExt}}
 
   package:darwin:
     summary: Packages a production build of the application into a `.app` bundle
@@ -55,10 +55,10 @@ tasks:
       - build-prod
       - generate-icons
     cmds:
-      - mkdir -p buildtest.app/Contents/{MacOS,Resources}
-      - cp build/icons.icns buildtest.app/Contents/Resources
-      - cp bin/testapp buildtest.app/Contents/MacOS
-      - cp build/Info.plist buildtest.app/Contents
+      - mkdir -p qoq.app/Contents/{MacOS,Resources}
+      - cp build/icons.icns qoq.app/Contents/Resources
+      - cp bin/qoq qoq.app/Contents/MacOS
+      - cp build/Info.plist qoq.app/Contents
 
 #  windows:generate:syso:
 #    dir: build
@@ -73,7 +73,7 @@ tasks:
   #      - generate-icons
   #    cmds:
   #      - task: windows:generate:syso
-  #      - go build -tags production -ldflags="-w -s -H windowsgui" -o bin/testapp.exe
+  #      - go build -tags production -ldflags="-w -s -H windowsgui" -o bin/qoq.exe
   #      - powershell Remove-item wails.syso
 
   build:production:

@@ -32,6 +32,7 @@ var AppData struct {
 }
 
 func main() {
+	fmt.Println("运行目录", ecore.E取运行目录())
 	if !ecore.E文件是否存在(ecore.E取运行目录() + "/default_config.json") {
 		字节集, _ := assets.ReadFile("assets/config/default_config.json")
 		ecore.E写到文件(ecore.E取运行目录()+"/default_config.json", 字节集)
@@ -111,9 +112,8 @@ func main() {
 	})
 	fmt.Println("window_set", window_set)
 	//window_set.Show()
+	window_set.SetAlwaysOnTop(true)
 	window_set.Hide()
-
-	//window.SetSize(500, 1000)
 
 	app.Events.On("js_translate", func(e *application.WailsEvent) {
 		jsondata := ecore.E到文本(e.Data)
@@ -294,7 +294,9 @@ func main() {
 			if rtdata.Name == "阿里云翻译" {
 				x翻译接口.E注册服务("阿里云翻译", etranslation.New阿里云翻译(rtdata.App_id, rtdata.Secret_key))
 			}
-
+			if rtdata.Name == "DeepL翻译" {
+				x翻译接口.E注册服务("DeepL翻译", etranslation.NewDeepL翻译(rtdata.App_id))
+			}
 			翻译内容, _ := x翻译接口.E取翻译模块(rtdata.Name).E翻译("我是一个小可爱", "zh_CN", "en_US")
 			app.Events.Emit(&application.WailsEvent{
 				Name: action,

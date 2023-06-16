@@ -45,7 +45,7 @@ tailwind.config = {
                 clifford: '#da373d',
             }
         }
-    }
+    },
 }
 
 window.runtime.EventsOn("setUrl", function (data) {

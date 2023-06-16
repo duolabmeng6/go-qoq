@@ -34,7 +34,7 @@ wails build
 
 ## macOS 系统翻译
 
-如果想要通过 `Easydict` 调用苹果 🍎 系统翻译，系统需要在 **macOS 12.3.1** 以上。
+如果想要调用苹果 🍎 系统翻译，系统需要在 **macOS 12.3.1** 以上。
 
 此外还需要安装一个快捷指令（`Easydict-Translate-V1.2.0`），请用 **Safari 浏览器** 打开下方链接。
 
