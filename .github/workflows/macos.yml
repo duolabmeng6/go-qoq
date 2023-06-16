@@ -24,6 +24,7 @@ jobs:
           echo ${{ format('version={0}', steps.create_version.outputs.tag_name ) }} 
 
   jobs_macos:
+    needs: [ jobs_v ]
     runs-on: macos-12
     env:
       version: ${{ needs.jobs_v.outputs.version }}
