@@ -55,7 +55,7 @@ jobs:
           cd ../../../..
       - name: 生成 Version.go 文件
         run: |
-          echo "package mymodel\n\nvar Version = `${{ env.version }}`" > mymodel/Version.go
+          echo "package mymodel\n\nvar Version = \"${{ env.version }}\"" > mymodel/Version.go
           cat mymodel/Version.go
       - name: 编译
         run: |
