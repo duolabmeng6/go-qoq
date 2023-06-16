@@ -44,7 +44,7 @@ jobs:
           mkdir -p /tmp/artifacts
           cp -r bin/qoq.app /tmp/artifacts/qoq.app
           cd /tmp/artifacts/qoq.app/Contents/MacOS
-          chmod +x ./qoq && ./qoq
+          chmod +x ./qoq
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
