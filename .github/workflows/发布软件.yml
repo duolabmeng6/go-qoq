@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v3
       - name: 查看文件
         run: |
-          echo "package mymodel\n\nvar Version = \"${steps.create_version.outputs.tag_name}\"" 
+          echo "package mymodel\n\nvar Version = \"${version}\"" 
           cat mymodel/Version.go
           
           pwd
