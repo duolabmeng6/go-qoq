@@ -1,10 +1,12 @@
-name: macos
+name: 发布软件
 
 on:
   push:
     branches:
       - master
   workflow_dispatch:
+
+permissions: write-all # 给所有工作写权限
 
 
 jobs:
