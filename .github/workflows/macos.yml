@@ -5,42 +5,59 @@ on:
 
 
 jobs:
-  greet:
-    runs-on: macos-12
+  jobs_v:
+    name: 构建版本号和变更信息
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.create_version.outputs.tag_name }} # 版本号
+      body: ${{ steps.create_version.outputs.body }} # 版本变更内容
     steps:
-      - name: Send greeting
-        run: echo "Hello"
+      - uses: release-drafter/release-drafter@v5
+        id: create_version
+        with:
+          config-name: release-drafter.yml # 配置文件在 .github/release-drafter.yml
+          disable-autolabeler: false # 禁止自动标签
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 查看变量
+        run: |
+          echo ${{ format('version={0}', steps.create_version.outputs.tag_name ) }} 
+
+  jobs_macos:
+    runs-on: macos-12
+    env:
+      version: ${{ needs.jobs_v.outputs.version }}
+      body: ${{ needs.jobs_v.outputs.body }}
+    steps:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: 查看文件
         run: |
           pwd
           ls -la
-      - name: 安装go
+      - name: 安装 go
         uses: actions/setup-go@v4
         with:
-          go-version: '^1.20.5' # The Go version to download (if necessary) and use.
-          cache-dependency-path: go.sum
+          go-version: '^1.20.5'
+          cache-dependency-path: |
+            **/go.sum
+            **/go.mod
           go-version-file: 'go.mod'
-      - name: 查看版本
-        run: go version
+      - run: go version
       - name: 安装 wails 工具
         run: |
           cd wails/v3/cmd/wails
           go install
           wails
           cd ../../../..
-      - name: 编译测试
-        #      run: GOOS=darwin GOARCH=amd64 go build -gcflags=all="-N -l" -o main2 main.go
+      - name: 编译
         run: |
           pwd
           wails task package:darwin
           ls -la
-      - name: 查看编译的文件
+      - name: 查看编译的文件保存
         run: |
           ls -la
-      - name: 保存 main2
-        run: |
           mkdir -p /tmp/artifacts
           cp -r bin/qoq.app /tmp/artifacts/qoq.app
           chmod +x /tmp/artifacts/qoq.app/Contents/MacOS/qoq
@@ -53,3 +70,33 @@ jobs:
         with:
           name: macos
           path: /tmp/artifacts/*.zip
+
+  jobs4:
+    needs: [ jobs_v,jobs_macos ]
+    name: 发布版本
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.jobs_v.outputs.version }}
+      body: ${{ needs.jobs_v.outputs.body }}
+    steps:
+      - name: 下载产物
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          path: ./
+      - name: 读入环境信息
+        run: |
+          echo ${{ format('version {0}', env.version ) }}
+          echo ${{steps.download.outputs.download-path}}
+          ls -R
+
+      - name: 发布文件
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true # 覆盖文件
+          #draft: true # 草稿 自己可见 版本号会保持一样 默认是自动发布 latest
+          #prerelease: true # 预发布 别人可以看到 版本号会继续加
+          tag: ${{ env.version }} # 版本号 v0.1.0
+          body: ${{ env.body }} # 输出的内容
+          artifacts: "macos/*.zip"
