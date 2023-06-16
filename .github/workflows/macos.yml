@@ -43,8 +43,7 @@ jobs:
         run: |
           mkdir -p /tmp/artifacts
           cp -r bin/qoq.app /tmp/artifacts/qoq.app
-          cd /tmp/artifacts/qoq.app/Contents/MacOS
-          chmod +x ./qoq
+          chmod +x /tmp/artifacts/qoq.app/Contents/MacOS/qoq
       - name: 创建压缩包
         run: |
           cd /tmp/artifacts/
