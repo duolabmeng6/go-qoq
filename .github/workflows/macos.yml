@@ -45,9 +45,12 @@ jobs:
           cp -r bin/qoq.app /tmp/artifacts/qoq.app
           cd /tmp/artifacts/qoq.app/Contents/MacOS
           chmod +x ./qoq
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
+      - name: 创建压缩包
+        run: |
+          cd /tmp/artifacts/
+          zip -r ./qoq_MacOS.zip ./qoq.app
+      - name: 上传产物
+        uses: actions/upload-artifact@v3
         with:
-          name: my-artifact
-          path: /tmp/artifacts/
+          name: macos
+          path: ./dist/*.zip
