@@ -24,18 +24,28 @@ jobs:
         go-version-file: 'go.mod'
     - name: 查看版本
       run: go version
+    - name: 安装 wails 工具
+      run: |
+        cd wails/v3/cmd/wails
+        go install
+        wails
+        cd ../../../..
     - name: 编译测试
-      run: GOOS=darwin GOARCH=amd64 go build -gcflags=all="-N -l" -o main2 main.go
+#      run: GOOS=darwin GOARCH=amd64 go build -gcflags=all="-N -l" -o main2 main.go
+      run: |
+        pwd
+        wails task package:darwin
+        ls -la
     - name: 查看编译的文件
       run: |
         ls -la
     - name: 保存 main2
       run: |
         mkdir -p /tmp/artifacts
-        cp main2 /tmp/artifacts/main2
+        cp -r bin/qoq.app /tmp/artifacts/qoq.app
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: my-artifact
-        path: /tmp/artifacts/main2
+        path: /tmp/artifacts/

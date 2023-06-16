@@ -55,10 +55,10 @@ tasks:
       - build-prod
       - generate-icons
     cmds:
-      - mkdir -p qoq.app/Contents/{MacOS,Resources}
-      - cp build/icons.icns qoq.app/Contents/Resources
-      - cp bin/qoq qoq.app/Contents/MacOS
-      - cp build/Info.plist qoq.app/Contents
+      - mkdir -p bin/qoq.app/Contents/{MacOS,Resources}
+      - cp build/icons.icns bin/qoq.app/Contents/Resources
+      - cp bin/qoq bin/qoq.app/Contents/MacOS
+      - cp build/Info.plist bin/qoq.app/Contents
 
 #  windows:generate:syso:
 #    dir: build
