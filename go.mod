@@ -2,11 +2,11 @@ module v3fanyi
 
 go 1.20
 
-replace github.com/wailsapp/wails/v3 => /Users/chensuilong/Desktop/goproject/wails/v3
+replace github.com/wailsapp/wails/v3 => ./wails/v3
 
-replace github.com/wailsapp/wails/v2 => /Users/chensuilong/Desktop/goproject/wails/v2
+replace github.com/wailsapp/wails/v2 => ./wails/v2
 
-replace github.com/duolabmeng6/goefun => /Users/chensuilong/Desktop/goproject/goefun
+//replace github.com/duolabmeng6/goefun => /Users/chensuilong/Desktop/goproject/goefun
 
 require (
 	github.com/duolabmeng6/goefun v1.3.0

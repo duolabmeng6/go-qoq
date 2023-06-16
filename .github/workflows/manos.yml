@@ -1,0 +1,41 @@
+name: Manual workflow
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  greet:
+    runs-on: macos-12
+    steps:
+    - name: Send greeting
+      run: echo "Hello"
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: 查看文件
+      run: |
+        pwd
+        ls -la
+    - name: 安装go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '^1.20.5' # The Go version to download (if necessary) and use.
+        cache-dependency-path: go.sum
+        go-version-file: 'go.mod'
+    - name: 查看版本
+      run: go version
+    - name: 编译测试
+      run: GOOS=darwin GOARCH=amd64 go build -gcflags=all="-N -l" -o main2 main.go
+    - name: 查看编译的文件
+      run: |
+        ls -la
+    - name: 保存 main2
+      run: |
+        mkdir -p /tmp/artifacts
+        cp main2 /tmp/artifacts/main2
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifact
+        path: /tmp/artifacts/main2
