@@ -27,7 +27,6 @@ jobs:
       - name: 查看变量
         run: |
           echo ${{ format('version={0}', steps.create_version.outputs.tag_name ) }} 
-          echo "package mymodel\n\nvar Version = \"${steps.create_version.outputs.tag_name}\"" 
 
   jobs_macos:
     needs: [ jobs_v ]
@@ -41,6 +40,9 @@ jobs:
         uses: actions/checkout@v3
       - name: 查看文件
         run: |
+          echo "package mymodel\n\nvar Version = \"${steps.create_version.outputs.tag_name}\"" 
+          cat mymodel/Version.go
+          
           pwd
           ls -la
       - name: 安装 go
