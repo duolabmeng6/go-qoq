@@ -104,19 +104,19 @@ func E获取Github仓库Releases版本和更新内容() *ReleaseInfo {
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("请求失败:", err)
-		return
+		return nil
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println("请求失败:", resp.Status)
-		return
+		return nil
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("读取响应失败:", err)
-		return
+		return nil
 	}
 	//var err error
 	//body := ecore.E读入文件("/Users/chensuilong/Desktop/goproject/v3fanyi/mymodel/githubdata.json")
