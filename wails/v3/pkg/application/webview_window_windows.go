@@ -26,6 +26,17 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/w32"
 )
 
+var edgeMap = map[string]uintptr{
+	"n-resize":  w32.HTTOP,
+	"ne-resize": w32.HTTOPRIGHT,
+	"e-resize":  w32.HTRIGHT,
+	"se-resize": w32.HTBOTTOMRIGHT,
+	"s-resize":  w32.HTBOTTOM,
+	"sw-resize": w32.HTBOTTOMLEFT,
+	"w-resize":  w32.HTLEFT,
+	"nw-resize": w32.HTTOPLEFT,
+}
+
 var showDevTools = func(chromium *edge.Chromium) {}
 
 type windowsWebviewWindow struct {
@@ -45,6 +56,19 @@ type windowsWebviewWindow struct {
 	chromium        *edge.Chromium
 	hasStarted      bool
 	resizeDebouncer func(func())
+
+	// resizeBorder* is the width/height of the resize border in pixels.
+	resizeBorderWidth  int32
+	resizeBorderHeight int32
+}
+
+func (w *windowsWebviewWindow) startResize(border string) error {
+	if !w32.ReleaseCapture() {
+		return fmt.Errorf("unable to release mouse capture")
+	}
+	// Use PostMessage because we don't want to block the caller until resizing has been finished.
+	w32.PostMessage(w.hwnd, w32.WM_NCLBUTTONDOWN, edgeMap[border], 0)
+	return nil
 }
 
 func (w *windowsWebviewWindow) startDrag() error {
@@ -547,7 +571,9 @@ func (w *windowsWebviewWindow) setFrameless(b bool) {
 
 func newWindowImpl(parent *WebviewWindow) *windowsWebviewWindow {
 	result := &windowsWebviewWindow{
-		parent: parent,
+		parent:             parent,
+		resizeBorderWidth:  int32(w32.GetSystemMetrics(w32.SM_CXSIZEFRAME)),
+		resizeBorderHeight: int32(w32.GetSystemMetrics(w32.SM_CYSIZEFRAME)),
 	}
 
 	return result
@@ -660,6 +686,13 @@ func (w *windowsWebviewWindow) WndProc(msg uint32, wparam, lparam uintptr) uintp
 			getNativeApplication().currentWindowID = w.parent.id
 			w.parent.emit(events.Common.WindowFocus)
 		}
+		// If we want to have a frameless window but with the default frame decorations, extend the DWM client area.
+		// This Option is not affected by returning 0 in WM_NCCALCSIZE.
+		// As a result we have hidden the titlebar but still have the default window frame styling.
+		// See: https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmextendframeintoclientarea#remarks
+		if w.framelessWithDecorations() {
+			w32.ExtendFrameIntoClientArea(w.hwnd, true)
+		}
 	case w32.WM_CLOSE:
 		if w.parent.options.HideOnClose {
 			w.hide()
@@ -671,8 +704,6 @@ func (w *windowsWebviewWindow) WndProc(msg uint32, wparam, lparam uintptr) uintp
 		windowsApp.unregisterWindow(w)
 	case w32.WM_NCLBUTTONDOWN:
 		w32.SetFocus(w.hwnd)
-	case w32.WM_NCLBUTTONUP:
-
 	case w32.WM_MOVE, w32.WM_MOVING:
 		_ = w.chromium.NotifyParentWindowPositionChanged()
 	case w32.WM_SIZE:
@@ -779,52 +810,6 @@ func (w *windowsWebviewWindow) WndProc(msg uint32, wparam, lparam uintptr) uintp
 			if w.framelessWithDecorations() {
 				w32.ExtendFrameIntoClientArea(w.hwnd, true)
 			}
-		case w32.WM_NCHITTEST:
-			// Get the cursor position
-			x := int32(w32.LOWORD(uint32(lparam)))
-			y := int32(w32.HIWORD(uint32(lparam)))
-			ptCursor := w32.POINT{X: x, Y: y}
-
-			// Get the window rectangle
-			rcWindow := w32.GetWindowRect(w.hwnd)
-
-			// Determine if the cursor is in a resize area
-			bOnResizeBorder := false
-			resizeBorderWidth := int32(5) // change this to adjust the resize border width
-			if ptCursor.X >= rcWindow.Right-resizeBorderWidth {
-				bOnResizeBorder = true // right edge
-			}
-			if ptCursor.Y >= rcWindow.Bottom-resizeBorderWidth {
-				bOnResizeBorder = true // bottom edge
-			}
-			if ptCursor.X <= rcWindow.Left+resizeBorderWidth {
-				bOnResizeBorder = true // left edge
-			}
-			if ptCursor.Y <= rcWindow.Top+resizeBorderWidth {
-				bOnResizeBorder = true // top edge
-			}
-
-			// Return the appropriate value
-			if bOnResizeBorder {
-				if ptCursor.X >= rcWindow.Right-resizeBorderWidth && ptCursor.Y >= rcWindow.Bottom-resizeBorderWidth {
-					return w32.HTBOTTOMRIGHT
-				} else if ptCursor.X <= rcWindow.Left+resizeBorderWidth && ptCursor.Y >= rcWindow.Bottom-resizeBorderWidth {
-					return w32.HTBOTTOMLEFT
-				} else if ptCursor.X >= rcWindow.Right-resizeBorderWidth && ptCursor.Y <= rcWindow.Top+resizeBorderWidth {
-					return w32.HTTOPRIGHT
-				} else if ptCursor.X <= rcWindow.Left+resizeBorderWidth && ptCursor.Y <= rcWindow.Top+resizeBorderWidth {
-					return w32.HTTOPLEFT
-				} else if ptCursor.X >= rcWindow.Right-resizeBorderWidth {
-					return w32.HTRIGHT
-				} else if ptCursor.Y >= rcWindow.Bottom-resizeBorderWidth {
-					return w32.HTBOTTOM
-				} else if ptCursor.X <= rcWindow.Left+resizeBorderWidth {
-					return w32.HTLEFT
-				} else if ptCursor.Y <= rcWindow.Top+resizeBorderWidth {
-					return w32.HTTOP
-				}
-			}
-			return w32.HTCLIENT
 
 		case w32.WM_NCCALCSIZE:
 			// Disable the standard frame by allowing the client area to take the full
@@ -843,7 +828,7 @@ func (w *windowsWebviewWindow) WndProc(msg uint32, wparam, lparam uintptr) uintp
 					// If the window is maximized we must adjust the client area to the work area of the monitor. Otherwise
 					// some content goes beyond the visible part of the monitor.
 					// Make sure to use the provided RECT to get the monitor, because during maximizig there might be
-					// a wrong monitor returned in multi screen mode when using MonitorFromWindow.
+					// a wrong monitor returned in multiscreen mode when using MonitorFromWindow.
 					// See: https://github.com/MicrosoftEdge/WebView2Feedback/issues/2549
 					monitor := w32.MonitorFromRect(rgrc, w32.MONITOR_DEFAULTTONULL)
 
@@ -1157,9 +1142,9 @@ func (w *windowsWebviewWindow) setupChromium() {
 		chromium.AdditionalBrowserArgs = append(chromium.AdditionalBrowserArgs, "--disable-gpu")
 	}
 
-	if globalApplication.capabilities.HasNativeDrag {
-		chromium.AdditionalBrowserArgs = append(chromium.AdditionalBrowserArgs, "--enable-features=msWebView2EnableDraggableRegions")
-	}
+	//if globalApplication.capabilities.HasNativeDrag {
+	//	chromium.AdditionalBrowserArgs = append(chromium.AdditionalBrowserArgs, "--enable-features=msWebView2EnableDraggableRegions")
+	//}
 
 	if len(disableFeatues) > 0 {
 		arg := fmt.Sprintf("--disable-features=%s", strings.Join(disableFeatues, ","))

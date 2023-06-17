@@ -22,8 +22,8 @@
 <body style="--wails-draggable:drag">
 
 <div id="app_set" class="flex h-screen flex-col" style="background:rgb(246, 246, 246); ">
-    <input type="radio" name="tab" id="tab-1" class="hidden"/>
-    <input type="radio" name="tab" id="tab-2" class="hidden" checked/>
+    <input type="radio" name="tab" id="tab-1" class="hidden" checked/>
+    <input type="radio" name="tab" id="tab-2" class="hidden"/>
     <input type="radio" name="tab" id="tab-3" class="hidden"/>
     <input type="radio" name="tab" id="tab-4" class="hidden"/>
     <div class="panel h-screen w-full flex-grow overflow-auto">
@@ -289,31 +289,29 @@
             },
             init() {
                 var dthis = this
-                setTimeout(function () {
-                    PyAction("操作_获取全部配置", "", function (data) {
-                        console.log("操作_获取全部配置", data)
-                        data = JSON.parse(data)
-                        console.log("操作_获取全部配置", data)
+                PyAction("操作_获取全部配置", "", function (data) {
+                    console.log("操作_获取全部配置", data)
+                    data = JSON.parse(data)
+                    console.log("操作_获取全部配置", data)
 
-                        dthis.翻译服务列表 = data.默认翻译服务列表
-                        dthis.划词翻译快捷键 = data.划词翻译快捷键
-                        dthis.截图翻译快捷键 = data.截图翻译快捷键
-                        dthis.显示输入框 = data.显示输入框
-                        dthis.显示语言切换栏 = data.显示语言切换栏
-                        dthis.将翻译原文的换行符替换为空格 = data.将翻译原文的换行符替换为空格
-                        dthis.将翻译原文的代码注释符号去掉 = data.将翻译原文的代码注释符号去掉
-                        dthis.将翻译原文的空格去掉 = data.将翻译原文的空格去掉
-                        dthis.自动复制截图翻译OCR结果 = data.自动复制截图翻译OCR结果
-                        dthis.自动复制首个翻译结果 = data.自动复制首个翻译结果
-                        dthis.点击翻译结果中的蓝色单词时将其复制 = data.点击翻译结果中的蓝色单词时将其复制
+                    dthis.翻译服务列表 = data.默认翻译服务列表
+                    dthis.划词翻译快捷键 = data.划词翻译快捷键
+                    dthis.截图翻译快捷键 = data.截图翻译快捷键
+                    dthis.显示输入框 = data.显示输入框
+                    dthis.显示语言切换栏 = data.显示语言切换栏
+                    dthis.将翻译原文的换行符替换为空格 = data.将翻译原文的换行符替换为空格
+                    dthis.将翻译原文的代码注释符号去掉 = data.将翻译原文的代码注释符号去掉
+                    dthis.将翻译原文的空格去掉 = data.将翻译原文的空格去掉
+                    dthis.自动复制截图翻译OCR结果 = data.自动复制截图翻译OCR结果
+                    dthis.自动复制首个翻译结果 = data.自动复制首个翻译结果
+                    dthis.点击翻译结果中的蓝色单词时将其复制 = data.点击翻译结果中的蓝色单词时将其复制
 
-                        this.翻译服务列表 = this.翻译服务列表.slice().sort((a, b) => a.order - b.order);
+                    this.翻译服务列表 = this.翻译服务列表.slice().sort((a, b) => a.order - b.order);
 
-                        dthis.$forceUpdate();
+                    dthis.$forceUpdate();
 
-                    })
+                })
 
-                }, 1000);
             },
             Cancel: function () {
                 console.log("取消")

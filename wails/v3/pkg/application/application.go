@@ -1,6 +1,7 @@
 package application
 
 import (
+	"encoding/json"
 	"github.com/wailsapp/wails/v3/internal/capabilities"
 	"log"
 	"net/http"
@@ -83,6 +84,15 @@ func New(appOptions Options) *App {
 		return globalApplication.capabilities.AsBytes()
 	}
 
+	srv.GetFlags = func() []byte {
+		updatedOptions := result.impl.GetFlags(appOptions)
+		flags, err := json.Marshal(updatedOptions)
+		if err != nil {
+			log.Fatal("Invalid flags provided to application: ", err.Error())
+		}
+		return flags
+	}
+
 	srv.UseRuntimeHandler(NewMessageProcessor())
 	result.assets = srv
 
@@ -136,6 +146,8 @@ type (
 		show()
 		getPrimaryScreen() (*Screen, error)
 		getScreens() ([]*Screen, error)
+		GetFlags(options Options) map[string]any
+		isOnMainThread() bool
 	}
 
 	runnable interface {
@@ -574,6 +586,12 @@ func (a *App) Clipboard() *Clipboard {
 }
 
 func (a *App) dispatchOnMainThread(fn func()) {
+	// If we are on the main thread, just call the function
+	if a.impl.isOnMainThread() {
+		fn()
+		return
+	}
+
 	mainThreadFunctionStoreLock.Lock()
 	id := generateFunctionStoreID()
 	mainThreadFunctionStore[id] = fn
@@ -659,20 +677,44 @@ func (a *App) runOrDeferToAppRun(r runnable) {
 }
 
 func invokeSync(fn func()) {
-	fn()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	globalApplication.dispatchOnMainThread(func() {
+		fn()
+		wg.Done()
+	})
+	wg.Wait()
 }
 
 func invokeSyncWithResult[T any](fn func() T) (res T) {
-	res = fn()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	globalApplication.dispatchOnMainThread(func() {
+		res = fn()
+		wg.Done()
+	})
+	wg.Wait()
 	return res
 }
 
 func invokeSyncWithError(fn func() error) (err error) {
-	err = fn()
-	return err
+	var wg sync.WaitGroup
+	wg.Add(1)
+	globalApplication.dispatchOnMainThread(func() {
+		err = fn()
+		wg.Done()
+	})
+	wg.Wait()
+	return
 }
 
 func invokeSyncWithResultAndError[T any](fn func() (T, error)) (res T, err error) {
-	res, err = fn()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	globalApplication.dispatchOnMainThread(func() {
+		res, err = fn()
+		wg.Done()
+	})
+	wg.Wait()
 	return res, err
 }

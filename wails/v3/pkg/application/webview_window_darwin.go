@@ -329,7 +329,17 @@ void windowZoomOut(void* nsWindow) {
 void windowSetPosition(void* nsWindow, int x, int y) {
 	// Set window position on main thread
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[(WebviewWindow*)nsWindow setFrameOrigin:NSMakePoint(x, y)];
+		WebviewWindow* window = (WebviewWindow*)nsWindow;
+		NSScreen* screen = [window screen];
+		if( screen == NULL ) {
+			screen = [NSScreen mainScreen];
+		}
+		NSRect windowFrame = [window frame];
+		NSRect screenFrame = [screen frame];
+		windowFrame.origin.x = screenFrame.origin.x + (float)x;
+		windowFrame.origin.y = (screenFrame.origin.y + screenFrame.size.height) - windowFrame.size.height - (float)y;
+
+		[window setFrame:windowFrame display:TRUE animate:FALSE];
 	});
 }
 
@@ -628,7 +638,15 @@ void windowGetPosition(void* nsWindow, int* x, int* y) {
 	NSRect frame = [window frame];
 	// set x and y
 	*x = frame.origin.x;
-	*y = frame.origin.y;
+
+	// Translate to screen coordinates so Y=0 is the top of the screen
+	NSScreen* screen = [window screen];
+	if( screen == NULL ) {
+		screen = [NSScreen mainScreen];
+	}
+	NSRect screenFrame = [screen frame];
+	*y = screenFrame.size.height - frame.origin.y - frame.size.height;
+
 }
 
 // Destroy window
@@ -819,6 +837,11 @@ type macosWebviewWindow struct {
 	parent   *WebviewWindow
 }
 
+func (w *macosWebviewWindow) startResize(border string) error {
+	// Not needed right now
+	return nil
+}
+
 func (w *macosWebviewWindow) focus() {
 	w.show()
 }
@@ -913,10 +936,11 @@ func (w *macosWebviewWindow) windowZoom() {
 }
 
 func (w *macosWebviewWindow) close() {
-	C.windowClose(w.nsWindow)
-	if !w.parent.options.HideOnClose {
-		globalApplication.deleteWindowByID(w.parent.id)
+	if w.parent.options.HideOnClose {
+		w.hide()
+		return
 	}
+	C.windowClose(w.nsWindow)
 }
 
 func (w *macosWebviewWindow) zoomIn() {
@@ -1173,6 +1197,11 @@ func (w *macosWebviewWindow) run() {
 			globalApplication.deleteWindowByID(w.parent.id)
 		})
 
+		w.parent.On(events.Mac.WindowShouldClose, func(_ *WindowEventContext) {
+			// TODO: Process "should close" callback for user
+			w.close()
+		})
+
 		if w.parent.options.HTML != "" {
 			w.setHTML(w.parent.options.HTML)
 		}
@@ -1202,13 +1231,10 @@ func (w *macosWebviewWindow) setBackgroundColour(colour RGBA) {
 
 func (w *macosWebviewWindow) position() (int, int) {
 	var x, y C.int
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go globalApplication.dispatchOnMainThread(func() {
+	invokeSync(func() {
 		C.windowGetPosition(w.nsWindow, &x, &y)
-		wg.Done()
 	})
-	wg.Wait()
+
 	return int(x), int(y)
 }
 

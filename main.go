@@ -12,6 +12,7 @@ import (
 	"github.com/ncruces/zenity"
 	hook "github.com/robotn/gohook"
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 	"log"
 	"os"
 	"runtime"
@@ -30,6 +31,45 @@ var AppData struct {
 	划词翻译快捷键 []string
 	截图翻译快捷键 []string
 	调整位置    bool
+	窗口_设置   *application.WebviewWindow
+}
+
+func 窗口_设置_显示(app *application.App) {
+	if AppData.窗口_设置 == nil {
+		AppData.窗口_设置 = app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
+			Title: "qoq翻译 - 设置",
+			Mac: application.MacWindow{
+				Backdrop: application.MacBackdropTranslucent,
+				TitleBar: application.MacTitleBar{
+					AppearsTransparent:   true,
+					Hide:                 false,
+					HideTitle:            true,
+					FullSizeContent:      true,
+					UseToolbar:           false,
+					HideToolbarSeparator: true,
+				},
+				InvisibleTitleBarHeight: 50,
+				DisableShadow:           true,
+			},
+			Width:  500,
+			Height: 600,
+			URL:    "index_set2.html",
+			Hidden: true,
+		})
+		ecore.E延时(300) //等待页面渲染完成再显示
+
+		AppData.窗口_设置.On(events.Mac.WindowShouldClose, func(ctx *application.WindowEventContext) {
+			fmt.Println("我想在这里禁止窗口销毁 我只隐藏他")
+			AppData.窗口_设置 = nil
+		})
+	}
+	AppData.窗口_设置.Show().Focus()
+}
+func 窗口_设置_隐藏(app *application.App) {
+	if AppData.窗口_设置 == nil {
+		return
+	}
+	AppData.窗口_设置.Hide()
 }
 
 func main() {
@@ -92,29 +132,8 @@ func main() {
 	//	window.ExecJS("app.init()")
 	//})
 
-	window_set := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Title: "qoq翻译 - 设置",
-		Mac: application.MacWindow{
-			Backdrop: application.MacBackdropTranslucent,
-			TitleBar: application.MacTitleBar{
-				AppearsTransparent:   true,
-				Hide:                 true,
-				HideTitle:            true,
-				FullSizeContent:      true,
-				UseToolbar:           false,
-				HideToolbarSeparator: true,
-			},
-			InvisibleTitleBarHeight: 50,
-			DisableShadow:           true,
-		},
-		Width:  500,
-		Height: 600,
-		URL:    "index_set2.html",
-	})
-	fmt.Println("window_set", window_set)
-	window_set.SetAlwaysOnTop(true)
-	window_set.Hide()
-	//window_set.Show()
+	//window_set.SetAlwaysOnTop(true)
+	//window_set.Hide()
 
 	app.Events.On("js_translate", func(e *application.WailsEvent) {
 		jsondata := ecore.E到文本(e.Data)
@@ -183,7 +202,8 @@ func main() {
 		data := etool.Json解析文本(jsondata, "data")
 		fmt.Println("action", action, "data", data)
 		if action == "操作_弹出菜单" {
-			window_set.Show().Focus()
+			窗口_设置_显示(app)
+
 			window.Hide()
 		}
 		if action == "操作_钉着窗口" {
@@ -197,7 +217,7 @@ func main() {
 				txt := mymodel.MacOcr(图片地址)
 				os.Remove(图片地址)
 				fmt.Println(txt)
-				window.Show()
+				window.Show().Focus()
 				app.Events.Emit(&application.WailsEvent{
 					Name: "setContent",
 					Data: txt,
@@ -260,7 +280,7 @@ func main() {
 			运行目录 := ecore.E取运行目录()
 			println("运行目录", 运行目录)
 			ecore.E写到文件(运行目录+"/user_config.json", []byte(data))
-			window_set.Hide()
+			窗口_设置_隐藏(app)
 
 			//重新加载配置
 			mymodel.E加载配置文件("./")
@@ -269,12 +289,10 @@ func main() {
 			绑定热键(app, window)
 		}
 		if action == "操作_设置取消" {
-			window_set.Hide()
+			窗口_设置_隐藏(app)
 		}
 		if action == "操作_检查更新" {
-			window_set.SetAlwaysOnTop(false)
 			检查更新()
-			window_set.SetAlwaysOnTop(true)
 		}
 		if action == "操作_测试API" {
 			fmt.Print("操作_测试API")
@@ -371,7 +389,7 @@ func main() {
 	})
 	myMenu.Add("输入翻译").OnClick(func(ctx *application.Context) {
 		println("输入翻译")
-		window.Show()
+		window.Show().Focus()
 	})
 	myMenu.Add("截图翻译 " + mymodel.GConfig.E截图翻译快捷键).OnClick(func(ctx *application.Context) {
 		println("截图翻译")
@@ -397,7 +415,7 @@ func main() {
 
 	myMenu.Add("偏好设置").OnClick(func(ctx *application.Context) {
 		println("偏好设置")
-		window_set.Show().Focus()
+		窗口_设置_显示(app)
 	})
 	myMenu.Add("检查更新").OnClick(func(ctx *application.Context) {
 		println("检查更新")
@@ -532,32 +550,34 @@ func 绑定热键(app *application.App, window *application.WebviewWindow) {
 }
 
 func GetWindowPosition(app *application.WebviewWindow) (int, int) {
-	screen, err := app.GetScreen()
-	if err != nil {
-		return 0, 0
-	}
+	//screen, err := app.GetScreen()
+	//if err != nil {
+	//	return 0, 0
+	//}
 	//wwidth := app.Width()
-	wheight := app.Height()
+	//wheight := app.Height()
 	//swidth := screen.Size.Width
-	sheight := screen.Size.Height
+	//sheight := screen.Size.Height
 	x, y := app.Position()
-	newX := x
-	newY := sheight - wheight - y - 1
-	return newX, newY
+	return x, y
+	//newX := x
+	//newY := sheight - wheight - y - 1
+	//return newX, newY
 }
 func SetWindowPosition(app *application.WebviewWindow, x int, y int) {
+	app.SetPosition(x, y)
 	//获取屏幕大小
-	screen, err := app.GetScreen()
-	if err != nil {
-		return
-	}
-	//wwidth := app.Width()
-	wheight := app.Height()
-	//swidth := screen.Size.Width
-	sheight := screen.Size.Height
-	newX := x
-	newY := sheight - wheight - y - 1
-	app.SetPosition(newX, newY)
+	//screen, err := app.GetScreen()
+	//if err != nil {
+	//	return
+	//}
+	////wwidth := app.Width()
+	//wheight := app.Height()
+	////swidth := screen.Size.Width
+	//sheight := screen.Size.Height
+	//newX := x
+	//newY := sheight - wheight - y - 1
+	//app.SetPosition(newX, newY)
 }
 
 func 调整窗口位置_限定高度(window *application.WebviewWindow, 内容高度 int) {
