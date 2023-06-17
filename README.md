@@ -6,10 +6,24 @@
 
 项目由 [wails](https://github.com/wailsapp/wails) 框架完成
 
+支持的翻译平台 可以通过私有的密钥使用更稳定
+
+- [x]  苹果系统翻译
+- [x] 百度翻译
+- [x] 彩云小译
+- [x] 有道翻译
+- [x] 火山翻译
+- [x] 腾讯翻译
+- [x] 阿里云翻译
+- [x] DeepL翻译
+
+
+
 # 进度
 
 - [x] qoq翻译 macOS 系统核心功能完成
-- [ ] macOS 打包为应用 待完成
+- [x] macOS 打包为应用 完成
+- [ ] 插件式翻译接口待开发
 - [ ] Window go-qoq 待开发 目前有qt6开发的 [window版本 qoq](https://github.com/duolabmeng6/qoq)
 
 
