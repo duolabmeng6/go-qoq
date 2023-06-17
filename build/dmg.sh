@@ -2,14 +2,12 @@
 
 # 定义应用程序名称和版本号
 APP_NAME="qoq"
-APP_VERSION="1.0.0"
+# 环境变量 version
+APP_VERSION="$version"
 
 # 创建临时目录和镜像文件名
-TEMP_DIR=$(mktemp -d)
+TEMP_DIR="./"
 DMG_NAME="${APP_NAME}-${APP_VERSION}.dmg"
-
-# 将应用程序复制到临时目录中
-cp -R "/Applications/${APP_NAME}.app" "${TEMP_DIR}/${APP_NAME}.app"
 
 # 创建 Applications 文件夹的快捷方式
 ln -s "/Applications" "${TEMP_DIR}/Applications"

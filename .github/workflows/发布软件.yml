@@ -76,8 +76,8 @@ jobs:
       - name: 创建压缩包
         run: |
           cd /tmp/artifacts/
-          zip -r ./qoq_MacOS.zip ./qoq.app
           ./dmg.sh
+          zip -r ./qoq_MacOS.zip ./qoq.app
 
       - name: 上传产物
         uses: actions/upload-artifact@v3
