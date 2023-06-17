@@ -9,6 +9,7 @@ import (
 	"github.com/duolabmeng6/goefun/etool"
 	"github.com/duolabmeng6/goefun/etranslation"
 	"github.com/go-vgo/robotgo"
+	"github.com/ncruces/zenity"
 	hook "github.com/robotn/gohook"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"log"
@@ -394,7 +395,64 @@ func main() {
 	})
 	myMenu.Add("检查更新").OnClick(func(ctx *application.Context) {
 		println("检查更新")
-		mymodel.OpenURL("https://github.com/duolabmeng6/go-qoq")
+
+		//mymodel.OpenURL("https://github.com/duolabmeng6/go-qoq")
+
+		下载文件夹路径 := mymodel.E取用户下载文件夹路径()
+		info := mymodel.E获取Github仓库Releases版本和更新内容()
+		println(info.MacDownloadURL)
+		println(下载文件夹路径)
+		if info.Version == mymodel.Version {
+			err := zenity.Info("当前已经是最新版本")
+			if err != nil {
+				return
+			}
+			return
+		}
+
+		err := zenity.Question("软件有新版本可用，是否更新？\n当前版本:"+
+			mymodel.Version+
+			"\n最新版本:"+info.Version,
+			zenity.Title("更新提示"),
+			zenity.Icon(zenity.QuestionIcon),
+			zenity.OKLabel("更新"),
+			zenity.CancelLabel("取消"))
+		ecore.E调试输出(err)
+		println("更新", err)
+		if err != nil {
+			return
+		}
+		progress, _ := zenity.Progress(
+			zenity.Title("软件更新"),
+			zenity.MaxValue(100), // 设置最大进度值为100
+		)
+		//for i := 1; i <= 100; i++ {
+		//	// 更新进度对话框的进度
+		//	progress.Value(i)
+		//	time.Sleep(100 * time.Millisecond) // 模拟任务执行时间
+		//}
+		progress.Text("正在下载...")
+
+		err = mymodel.E下载带进度回调(info.MacDownloadURL, 下载文件夹路径+"/qoq_MacOS.zip", func(进度 float64) {
+			fmt.Println("正在下载...", 进度)
+			progress.Text("正在下载..." + fmt.Sprintf("%.2f", 进度) + "%")
+			progress.Value(int(进度))
+		})
+		if err != nil {
+			fmt.Println("下载出错:", err)
+			zenity.Info("下载错误,检查你的网络")
+			progress.Close()
+			return
+		}
+		progress.Text("下载完成 即将完成更新")
+		if progress.Close() != nil {
+			fmt.Println("点击了取消")
+			return
+		}
+		fmt.Println("下载完成了")
+		flag, s := mymodel.E更新自己MacOS应用(下载文件夹路径+"/qoq_MacOS.zip", "qoq.app")
+		println(flag, s)
+
 	})
 	myMenu.AddSeparator()
 
