@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+
+    <link rel="stylesheet" href="font-awesome.css"/>
+    <link href="daisyui.css" rel="stylesheet" type="text/css"/>
+    <script src="tailwindcss.3.2.6.js"></script>
+
+    <script src="vue2.js"></script>
+    <script src="Sortable.min.js"></script>
+    <script src="vuedraggable.umd.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app">
+        <div class="grid grid-cols-4 gap-4 bg-slate-100">
+            <div class="p-4">启用</div>
+            <div class="p-4">翻译平台</div>
+            <div class="p-4">顺序</div>
+            <div class="p-4">操作</div>
+        </div>
+
+        <draggable :scroll-sensitivity="100" :force-fallback="true" handle=".chapter-item-sort" animation="250"
+                   v-model="翻译服务列表" :options="{ group: 'items' }" class="draggable-list" v-bind:clone="true">
+            <template v-for="item in 翻译服务列表">
+                <div class="grid grid-cols-4 gap-4" :key="item.id">
+                    <div class="w-1 p-4">
+                        <input type="checkbox" class="toggle-success toggle" v-model="item.enable" />
+                    </div>
+                    <div class="py-4">
+                        <div class="flex space-x-3 text-left">
+                            <div class="avatar">
+                                <div class="mask mask-squircle h-6 w-6 bg-blue-300">
+                                    <img :src="item.logo" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-sm">{{item.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 chapter-item-sort">
+                        <i class="fas fa-grip-vertical pl-4"></i>
+                    </div>
+                    <div class="p-4">
+                        <a v-if="item.params.length !== 0" class="btn-info btn-outline btn btn-sm"
+                           @click="getDynamicUrl(item)">设置</a>
+                        <dialog :id="item.name" class="modal">
+                            <form method="dialog" class="modal-box">
+                                <h3 class="text-lg font-bold">配置API {{item.name}}</h3>
+                                <p class="py-4"></p>
+
+                                <div class="form-control w-full max-w-xs">
+                                    <label class="label">
+                                        <span class="label-text">{{item.params[0]}}</span>
+                                    </label>
+                                    <input v-model="item.app_id" type="text" placeholder="请输入"
+                                           class="input-bordered input w-full max-w-xs"/>
+
+                                    <label class="label" v-if="item.params.length == 2">
+                                        <span class="label-text">{{item.params[1]}}</span>
+                                    </label>
+                                    <input v-model="item.secret_key" type="text" placeholder="请输入"
+                                           class="input-bordered input w-full max-w-xs"
+                                           v-if="item.params.length == 2"/>
+
+                                    <p v-if="testApiRT">测试api返回 {{testApiRT}}</p>
+                                </div>
+
+                                <div class="modal-action">
+                                    <a class="btn-info btn-outline btn btn-md"
+                                       @click="testAPI(item)">测试API</a>
+                                    <button class="btn-primary btn-outline btn btn-md">确定</button>
+                                </div>
+                            </form>
+                        </dialog>
+                    </div>
+                </div>
+            </template>
+        </draggable>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            testApiRT: "",
+
+            翻译服务列表: [
+                {
+                    logo: "https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg",
+                    name: "deepL翻译",
+                    enable: false,
+                    order: 1,
+                    app_id: "123",
+                    secret_key: "123",
+                    params: ["app_idxx", "secret_keyxx"]
+                },
+                {
+                    logo: "https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg",
+                    name: "系统翻译5",
+                    enable: false,
+                    order: 5,
+                    app_id: "123",
+                    secret_key: "123",
+                    params: []
+                },
+                {
+                    logo: "https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg",
+                    name: "deepL翻译2",
+                    enable: false,
+                    order: 1,
+                    app_id: "123",
+                    secret_key: "123",
+                    params: ["app_idxx", "secret_keyxx"]
+                },
+                {
+                    logo: "https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg",
+                    name: "deepL翻译4",
+                    enable: false,
+                    order: 4,
+                    app_id: "123",
+                    secret_key: "123",
+                    params: ["app_idxx", "secret_keyxx"]
+                },
+            ]
+        },
+        //初始化的时候执行
+        created() {
+            this.翻译服务列表 = this.翻译服务列表.slice().sort((a, b) => a.order - b.order);
+        },
+        methods: {
+            getDynamicUrl(item) {
+                eval(`${item.name}.showModal()`)
+            },
+        }
+
+    });
+</script>
+</body>
+</html>

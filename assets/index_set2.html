@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+
+    <link rel="stylesheet" href="font-awesome.css"/>
+    <link href="daisyui.css" rel="stylesheet" type="text/css"/>
+    <script src="tailwindcss.3.2.6.js"></script>
+    <script src="vue2.js"></script>
+    <script src="main.js"></script>
+    <script src="/wails/ipc.js"></script>
+    <script src="/wails/runtime.js"></script>
+
+
+    <script src="Sortable.min.js"></script>
+    <script src="vuedraggable.umd.min.js"></script>
+
+</head>
+<!--https://play.tailwindcss.com/l9c0QwjkbD-->
+<body style="--wails-draggable:drag">
+
+<div id="app_set" class="flex h-screen flex-col" style="background:rgb(246, 246, 246); ">
+    <input type="radio" name="tab" id="tab-1" class="hidden"/>
+    <input type="radio" name="tab" id="tab-2" class="hidden" checked/>
+    <input type="radio" name="tab" id="tab-3" class="hidden"/>
+    <input type="radio" name="tab" id="tab-4" class="hidden"/>
+    <div class="panel h-screen w-full flex-grow overflow-auto">
+        <div class="fixed-header nav flex justify-center border-b-2 border-gray-200 p-4 py-4"
+             style="background:rgb(251, 251, 251);">
+            <label for="tab-1">
+                <div class="toolbar-item">
+                    <i class="fa fa-cog"></i>
+                    <span>设置</span>
+                </div>
+            </label>
+            <label for="tab-2">
+                <div class="toolbar-item">
+                    <i class="fa fa-server"></i>
+                    <span>服务</span>
+                </div>
+            </label>
+            <label for="tab-3">
+                <div class="toolbar-item">
+                    <i class="fa fa-lock"></i>
+                    <span>隐私</span>
+                </div>
+            </label>
+            <label for="tab-4">
+                <div class="toolbar-item">
+                    <i class="fa fa-info-circle"></i>
+                    <span>关于</span>
+                </div>
+            </label>
+        </div>
+        <div class="tab-tab-1 tab hidden w-full p-4 text-black" style="">
+            <div style="width:100%;">
+                <div class="mb-4 flex flex-row items-center">
+                    <label for="划词翻译快捷键" class="mr-2 block whitespace-nowrap text-sm font-medium text-gray-700">划词翻译</label>
+                    <input v-on:keydown="handleKeyDown" v-model="划词翻译快捷键" id="划词翻译快捷键" type="text"
+                           class="w-60 rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                           placeholder="绑定快捷键"/>
+                </div>
+
+                <div class="mb-4 flex flex-row items-center">
+                    <label for="截图翻译快捷键" class="mr-2 block whitespace-nowrap text-sm font-medium text-gray-700">截图翻译</label>
+                    <input v-on:keydown="handleKeyDown" v-model="截图翻译快捷键" id="截图翻译快捷键" type="text"
+                           class="w-60 rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                           placeholder="绑定快捷键"/>
+                </div>
+
+                <div class="form">
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="show-input" class="form-checkbox mr-2"
+                               v-model="显示输入框"/>
+                        <label for="show-input" class="form-label ml-2">显示输入框</label>
+                    </div>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="show-language-switch"
+                               class="form-checkbox mr-2" v-model="显示语言切换栏"/>
+                        <label for="show-language-switch" class="form-label ml-2">显示语言切换栏</label>
+                    </div>
+
+                    <hr class="form-divider"/>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="replace-line-breaks"
+                               class="form-checkbox mr-2" v-model="将翻译原文的换行符替换为空格"/>
+                        <label for="replace-line-breaks" class="form-label ml-2">将翻译原文的换行符替换为空格</label>
+                    </div>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="remove-code-comments"
+                               class="form-checkbox mr-2" v-model="将翻译原文的代码注释符号去掉"/>
+                        <label for="remove-code-comments" class="form-label ml-2">将翻译原文的代码注释符号去掉</label>
+                    </div>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="remove-spaces"
+                               class="form-checkbox mr-2" v-model="将翻译原文的空格去掉"/>
+                        <label for="remove-spaces" class="form-label ml-2">将翻译原文的空格去掉</label>
+                    </div>
+
+                    <hr class="form-divider"/>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="auto-copy-ocr"
+                               class="form-checkbox mr-2" v-model="自动复制截图翻译OCR结果"/>
+                        <label for="auto-copy-ocr" class="form-label ml-2">自动复制截图翻译OCR结果</label>
+                    </div>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="auto-copy-translation"
+                               class="form-checkbox mr-2" v-model="自动复制首个翻译结果"/>
+                        <label for="auto-copy-translation" class="form-label ml-2">自动复制首个翻译结果</label>
+                    </div>
+
+                    <div class="mb-4 flex flex-row items-center">
+                        <input class="checkbox-info checkbox" type="checkbox" id="copy-blue-words"
+                               class="form-checkbox mr-2" v-model="点击翻译结果中的蓝色单词时将其复制"/>
+                        <label for="copy-blue-words" class="form-label ml-2">点击翻译结果中的蓝色单词时将其复制</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-tab-2 tab hidden h-full w-full items-start text-black" style="">
+            <div class="w-full">
+                <div class="overflow-x-auto text-left">
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="p-4">启用</div>
+                        <div class="p-4">翻译平台</div>
+                        <div class="p-4">顺序</div>
+                        <div class="p-4">操作</div>
+                    </div>
+
+                    <draggable :scroll-sensitivity="100" :force-fallback="true" handle=".chapter-item-sort"
+                               animation="250"
+                               v-model="翻译服务列表" :options="{ group: 'items' }" class="draggable-list"
+                               >
+                        <template v-for="item in 翻译服务列表">
+                            <div class="grid grid-cols-4 gap-4" :key="item.id">
+                                <div class="w-1 p-4">
+                                    <input type="checkbox" class="toggle-success toggle" v-model="item.enable"/>
+                                </div>
+                                <div class="py-4">
+                                    <div class="flex space-x-3 text-left">
+                                        <div class="avatar">
+                                            <div class="mask mask-squircle h-6 w-6 bg-blue-300">
+                                                <img :src="item.logo"/>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm">{{item.name}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4 chapter-item-sort">
+                                    <i class="fas fa-grip-vertical pl-4"></i>
+                                </div>
+                                <div class="p-4">
+                                    <a v-if="item.params.length !== 0" class="btn-info btn-outline btn btn-sm"
+                                       @click="getDynamicUrl(item)">设置</a>
+                                    <dialog :id="item.name" class="modal">
+                                        <form method="dialog" class="modal-box">
+                                            <h3 class="text-lg font-bold">配置API {{item.name}}</h3>
+                                            <p class="py-4"></p>
+
+                                            <div class="form-control w-full max-w-xs">
+                                                <label class="label">
+                                                    <span class="label-text">{{item.params[0]}}</span>
+                                                </label>
+                                                <input v-model="item.app_id" type="text" placeholder="请输入"
+                                                       class="input-bordered input w-full max-w-xs"/>
+
+                                                <label class="label" v-if="item.params.length == 2">
+                                                    <span class="label-text">{{item.params[1]}}</span>
+                                                </label>
+                                                <input v-model="item.secret_key" type="text" placeholder="请输入"
+                                                       class="input-bordered input w-full max-w-xs"
+                                                       v-if="item.params.length == 2"/>
+
+                                                <p v-if="testApiRT">测试api返回 {{testApiRT}}</p>
+                                            </div>
+
+                                            <div class="modal-action">
+                                                <a class="btn-info btn-outline btn btn-md"
+                                                   @click="testAPI(item)">测试API</a>
+                                                <button class="btn-primary btn-outline btn btn-md">确定</button>
+                                            </div>
+                                        </form>
+                                    </dialog>
+                                </div>
+                            </div>
+                        </template>
+                    </draggable>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-tab-3 tab hidden text-black" style="width:100%;">
+            <div style="width:100%;">
+                <h3>隐私声明</h3>
+
+                <p>qoq 是开源软件，不会收集用户隐私，如果你感兴趣，可以查看代码。</p>
+            </div>
+        </div>
+        <div class="tab-tab-4 tab hidden text-black" style="width:100%;">
+            <div class="flex items-center gap-2 text-center" style="flex-direction: column;width:100%;">
+                <div>
+                    <img src="https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg"/>
+                </div>
+                <h1>qoq</h1>
+                <p>版本 1.0.1</p>
+                <button class="btn-primary btn-outline btn btn-xs" @click="checkUpdata">检查更新</button>
+                <p>Github: <a class="link-info link" target="_blank" href="https://github.com/duolabmeng6/go-qoq">https://github.com/duolabmeng6/go-qoq</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="tab-tab-1 tab-tab-2 hidden p-2">
+        <div class="flex w-full items-end justify-end">
+            <button class="mr-2 bg-gray-500 px-4 py-2 text-white last:rounded hover:bg-gray-600" @click="Cancel">取消
+            </button>
+            <button class="mr-2 mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600" @click="Save">保存
+            </button>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script type="text/javascript">
+    var draggable = window.vuedraggable;
+    var app = new Vue({
+        el: '#app_set',
+        components: {
+            draggable
+        },
+        data: {
+            list: [
+                {id: 1, name: 'Item 1', order: 3},
+                {id: 2, name: 'Item 2', order: 2},
+                {id: 3, name: 'Item 3', order: 1},
+                {id: 4, name: 'Item 4', order: 4},
+            ],
+
+            testApiRT: "",
+            划词翻译快捷键: '',
+            截图翻译快捷键: '',
+            显示输入框: true,
+            显示语言切换栏: true,
+            将翻译原文的换行符替换为空格: true,
+            将翻译原文的代码注释符号去掉: true,
+            将翻译原文的空格去掉: true,
+            自动复制截图翻译OCR结果: true,
+            自动复制首个翻译结果: true,
+            点击翻译结果中的蓝色单词时将其复制: true,
+            翻译服务列表: [
+                // {
+                //     logo: "https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg",
+                //     name: "deepL翻译deepL翻译",
+                //     enable: false,
+                //     order: 1,
+                //     app_id: "123",
+                //     secret_key: "123",
+                //     params: ["app_idxx", "secret_keyxx"]
+                // },
+                // {
+                //     logo: "https://static.deepl.com/img/logo/DeepL_Logo_darkBlue_v2.svg",
+                //     name: "系统翻译",
+                //     enable: false,
+                //     order: 2,
+                //     app_id: "123",
+                //     secret_key: "123",
+                //     params: []
+                // }
+            ]
+        },
+        mounted: function () {
+            this.init();
+
+        },
+
+        methods: {
+            getDynamicUrl(item) {
+                eval(`${item.name}.showModal()`)
+            },
+            init() {
+                var dthis = this
+                setTimeout(function () {
+                    PyAction("操作_获取全部配置", "", function (data) {
+                        console.log("操作_获取全部配置", data)
+                        data = JSON.parse(data)
+                        console.log("操作_获取全部配置", data)
+
+                        dthis.翻译服务列表 = data.默认翻译服务列表
+                        dthis.划词翻译快捷键 = data.划词翻译快捷键
+                        dthis.截图翻译快捷键 = data.截图翻译快捷键
+                        dthis.显示输入框 = data.显示输入框
+                        dthis.显示语言切换栏 = data.显示语言切换栏
+                        dthis.将翻译原文的换行符替换为空格 = data.将翻译原文的换行符替换为空格
+                        dthis.将翻译原文的代码注释符号去掉 = data.将翻译原文的代码注释符号去掉
+                        dthis.将翻译原文的空格去掉 = data.将翻译原文的空格去掉
+                        dthis.自动复制截图翻译OCR结果 = data.自动复制截图翻译OCR结果
+                        dthis.自动复制首个翻译结果 = data.自动复制首个翻译结果
+                        dthis.点击翻译结果中的蓝色单词时将其复制 = data.点击翻译结果中的蓝色单词时将其复制
+
+                        this.翻译服务列表 = this.翻译服务列表.slice().sort((a, b) => a.order - b.order);
+
+                        dthis.$forceUpdate();
+
+                    })
+
+                }, 1000);
+            },
+            Cancel: function () {
+                console.log("取消")
+                PyAction("操作_设置取消", "")
+
+
+            },
+            Save: function () {
+                console.log("保存")
+
+
+                formdata = {
+                    划词翻译快捷键: this.划词翻译快捷键,
+                    截图翻译快捷键: this.截图翻译快捷键,
+                    显示输入框: this.显示输入框,
+                    显示语言切换栏: this.显示语言切换栏,
+                    将翻译原文的换行符替换为空格: this.将翻译原文的换行符替换为空格,
+                    将翻译原文的空格去掉: this.将翻译原文的空格去掉,
+                    自动复制截图翻译OCR结果: this.自动复制截图翻译OCR结果,
+                    自动复制首个翻译结果: this.自动复制首个翻译结果,
+                    点击翻译结果中的蓝色单词时将其复制: this.点击翻译结果中的蓝色单词时将其复制,
+                }
+                console.log("保存数据", formdata)
+                // 遍历 翻译服务列表 获取 name  app_id secret_key
+                var fylist = []
+                for (let index = 0; index < this.翻译服务列表.length; index++) {
+                    const element = this.翻译服务列表[index];
+                    console.log(element)
+                    fylist.push({
+                        name: element.name,
+                        app_id: element.app_id,
+                        secret_key: element.secret_key,
+                        enable: element.enable,
+                        order: index + 1,
+                    })
+                }
+                console.log("fylist", fylist)
+                formdata.翻译服务列表 = fylist
+                console.log("保存数据", formdata)
+
+                PyAction("操作_保存配置", formdata)
+
+            },
+            testAPI: function (item) {
+                dthis = this
+                console.log("测试API", item)
+                if (item.app_id == "") {
+                    dthis.testApiRT = "请填写参数后再测试"
+                    return
+                }
+
+                PyAction("操作_测试API", item, function (data) {
+                    console.log("操作_测试API", data)
+                    data = JSON.parse(data)
+                    dthis.testApiRT = "测试结果:" + data.翻译内容
+                })
+
+            },
+            checkUpdata: function () {
+                console.log("检查更新")
+                PyAction("操作_检查更新", "", function (data) {
+
+                })
+            },
+            handleKeyDown: function (e) {
+                e.preventDefault(); // 组织默认行为
+                const inputElement = event.target;
+                const inputValue = inputElement.value;
+                const inputId = inputElement.id;
+                let str = parseKey(e);
+                if (e.keyCode === 8) {
+                    str = ""
+                }
+                if (inputId === '划词翻译快捷键') {
+                    // 处理划词翻译的逻辑
+                    this.划词翻译快捷键 = str;
+                }
+                if (inputId === '截图翻译快捷键') {
+                    // 处理截图翻译的逻辑
+                    this.截图翻译快捷键 = str;
+                }
+
+            },
+
+        }
+    })
+</script>
+<script>
+    const isMacOS = navigator.userAgent.indexOf("Mac OS") > 0;
+    const keyCodeMap = initMap();
+
+    function initMap() {
+        const map = {
+            8: "Backspace",
+            9: "Tab",
+            13: "Enter",
+            16: "Shift",
+            17: isMacOS ? "Control" : "Ctrl",
+            18: "Alt",
+            27: "Esc",
+            32: "Space",
+            33: "Page Up",
+            34: "Page Down",
+            35: "End",
+            36: "Home",
+            37: "Left",
+            38: "Up",
+            39: "Right",
+            40: "Down",
+            45: "Insert",
+            46: "Delete",
+            91: "Cmd",
+            96: "Num0",
+            97: "Num1",
+            98: "Num2",
+            99: "Num3",
+            100: "Num4",
+            101: "Num5",
+            102: "Num6",
+            103: "Num7",
+            104: "Num8",
+            105: "Num9",
+            106: "Num*",
+            107: "Num+",
+            109: "Num-",
+            110: "Num.",
+            111: "Num/",
+            187: "=",
+            188: ",",
+            190: ".",
+            191: "/",
+            192: "`",
+            219: "[",
+            220: "\\",
+            221: "]",
+            222: "'",
+        };
+        for (let i = 1; i <= 12; i++) {
+            map[111 + i] = "F" + i;
+        }
+        if (isMacOS) {
+            map[91] = "Cmd";
+            map[93] = "Cmd";
+            map[8] = "Delete";
+        }
+        return map;
+    }
+
+    function parseKey(ev) {
+        const meta = ev.metaKey,
+            ctrl = ev.ctrlKey,
+            shift = ev.shiftKey,
+            alt = ev.altKey,
+            keyCode = ev.keyCode;
+        let str = "",
+            kStr = keyCodeMap[keyCode];
+
+        if (isMacOS && meta) {
+            str += "Cmd+";
+        }
+        if (ctrl) {
+            str += isMacOS ? "Control+" : "Ctrl+";
+        }
+        if (shift) {
+            str += "Shift+";
+        }
+        if (alt) {
+            str += "Alt+";
+        }
+
+        if (
+            (keyCode >= 48 && keyCode <= 57) ||
+            (keyCode >= 65 && keyCode <= 90)
+        ) {
+            str += String.fromCharCode(keyCode);
+        } else if (keyCode >= 96 && keyCode <= 105) {
+            // 右侧小键盘上的按键
+            str += kStr;
+        } else if (
+            kStr !== "Cmd" &&
+            kStr !== "Ctrl" &&
+            kStr !== "Control" &&
+            kStr !== "Shift" &&
+            kStr !== "Alt"
+        ) {
+            // 不是 meta/alt/ctrl/shift
+            if (Object.hasOwnProperty.call(keyCodeMap, keyCode)) {
+                str += keyCodeMap[keyCode];
+            }
+        }
+
+        if (str && /[^+]\+$/.test(str)) {
+            str = str.substring(0, str.length - 1);
+        }
+        return str;
+    }
+</script>
+
+
+<style>
+
+
+    #tab-1:checked ~ .panel > .nav label[for="tab-1"] div {
+        background-color: rgb(238, 238, 238);
+    }
+
+    #tab-2:checked ~ .panel > .nav label[for="tab-2"] div {
+        background-color: rgb(238, 238, 238);
+    }
+
+    #tab-3:checked ~ .panel > .nav label[for="tab-3"] div {
+        background-color: rgb(238, 238, 238);
+    }
+
+    #tab-4:checked ~ .panel > .nav label[for="tab-4"] div {
+        background-color: rgb(238, 238, 238);
+    }
+
+
+    #tab-1:checked ~ .tab-tab-1 {
+        display: block;
+    }
+
+    #tab-2:checked ~ .tab-tab-2 {
+        display: block;
+    }
+
+    #tab-1:checked ~ .panel > .tab-tab-1 {
+        display: flex;
+    }
+
+    #tab-2:checked ~ .panel > .tab-tab-2 {
+        display: flex;
+    }
+
+    #tab-3:checked ~ .panel > .tab-tab-3 {
+        display: flex;
+    }
+
+    #tab-4:checked ~ .panel > .tab-tab-4 {
+        display: flex;
+    }
+
+    .tab {
+        padding-top: 120px;
+    }
+
+    .toolbar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        width: 64px; /* 正方形宽度 */
+        height: 64px; /* 正方形高度 */
+        background-color: rgb(251, 251, 251);
+        border-radius: 4px;
+    }
+
+    .toolbar-item i {
+        font-size: 24px; /* 调整图标大小 */
+        line-height: 1; /* 减少行高 */
+        margin-bottom: 0.25rem;
+        color: rgb(69, 148, 213); /* 浅蓝色 */
+    }
+
+    .toolbar-item span {
+        font-size: 12px; /* 调整文字大小 */
+        text-align: center;
+        color: rgb(113, 113, 113);
+        line-height: 1; /* 减少行高 */
+    }
+
+    .toolbar-item.active {
+        background-color: rgb(238, 238, 238);
+    }
+
+    .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+    }
+
+</style>
+</html>

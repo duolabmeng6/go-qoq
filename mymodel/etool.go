@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"sort"
 )
 
 func SystemScreenshot() string {
@@ -228,6 +229,10 @@ func E加载配置文件(dir string) bool {
 
 		}
 	}
+	// 根据 GConfig.E默认翻译服务列表[i].Order 排序
+	sort.Slice(GConfig.E默认翻译服务列表, func(i, j int) bool {
+		return GConfig.E默认翻译服务列表[i].Order < GConfig.E默认翻译服务列表[j].Order
+	})
 
 	G翻译接口.E注册服务("百度翻译", etranslation.New百度翻译(ecore.Env("百度翻译_App_id", ""), ecore.Env("百度翻译_Secret_key", "")))
 	G翻译接口.E注册服务("彩云小译", etranslation.New彩云小译(ecore.Env("彩云小译_App_id", "")))

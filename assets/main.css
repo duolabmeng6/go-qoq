@@ -193,3 +193,22 @@ select {
   right: 0;
   z-index: 999;
 }
+
+.drag-handle {
+  cursor: grab;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  background-color: #ccc;
+  border-radius: 3px;
+}
