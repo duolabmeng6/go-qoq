@@ -83,7 +83,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: macos
-          path: /tmp/artifacts/*.zip,/tmp/artifacts/*.dmg
+          path: |
+            /tmp/artifacts/*.zip
+            /tmp/artifacts/*.dmg
 
   jobs4:
     needs: [ jobs_v,jobs_macos ]
