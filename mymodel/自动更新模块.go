@@ -98,28 +98,28 @@ type ReleaseInfo struct {
 }
 
 func E获取Github仓库Releases版本和更新内容() *ReleaseInfo {
-	//owner := "duolabmeng6" // GitHub 仓库的所有者
-	//repo := "go-qoq"       // GitHub 仓库的名称
-	//url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases", owner, repo)
-	//resp, err := http.Get(url)
-	//if err != nil {
-	//	fmt.Println("请求失败:", err)
-	//	return
-	//}
-	//defer resp.Body.Close()
-	//
-	//if resp.StatusCode != http.StatusOK {
-	//	fmt.Println("请求失败:", resp.Status)
-	//	return
-	//}
-	//
-	//body, err := io.ReadAll(resp.Body)
-	//if err != nil {
-	//	fmt.Println("读取响应失败:", err)
-	//	return
-	//}
-	var err error
-	body := ecore.E读入文件("/Users/chensuilong/Desktop/goproject/v3fanyi/mymodel/githubdata.json")
+	owner := "duolabmeng6" // GitHub 仓库的所有者
+	repo := "go-qoq"       // GitHub 仓库的名称
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases", owner, repo)
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("请求失败:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("请求失败:", resp.Status)
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("读取响应失败:", err)
+		return
+	}
+	//var err error
+	//body := ecore.E读入文件("/Users/chensuilong/Desktop/goproject/v3fanyi/mymodel/githubdata.json")
 
 	var releases GithubJSONData
 
