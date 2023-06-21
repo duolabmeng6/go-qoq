@@ -505,6 +505,10 @@ func 绑定热键(app *application.App, window *application.WebviewWindow) {
 		})
 		robotgo.EventHook(hook.KeyUp, []string{}, func(e hook.Event) {
 			//ecore.E调试输出("G按下的热键列表", G按下的热键列表)
+			// Esc 关闭窗口
+			if e.Keychar == rune(65535) {
+				window.Hide()
+			}
 			if mymodel.ContainsAll(G按下的热键列表, AppData.划词翻译快捷键...) {
 				println("划词翻译")
 				go 划词翻译(app, window)
