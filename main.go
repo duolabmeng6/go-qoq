@@ -554,34 +554,11 @@ func 绑定热键(app *application.App, window *application.WebviewWindow) {
 }
 
 func GetWindowPosition(app *application.WebviewWindow) (int, int) {
-	//screen, err := app.GetScreen()
-	//if err != nil {
-	//	return 0, 0
-	//}
-	//wwidth := app.Width()
-	//wheight := app.Height()
-	//swidth := screen.Size.Width
-	//sheight := screen.Size.Height
 	x, y := app.Position()
 	return x, y
-	//newX := x
-	//newY := sheight - wheight - y - 1
-	//return newX, newY
 }
 func SetWindowPosition(app *application.WebviewWindow, x int, y int) {
 	app.SetPosition(x, y)
-	//获取屏幕大小
-	//screen, err := app.GetScreen()
-	//if err != nil {
-	//	return
-	//}
-	////wwidth := app.Width()
-	//wheight := app.Height()
-	////swidth := screen.Size.Width
-	//sheight := screen.Size.Height
-	//newX := x
-	//newY := sheight - wheight - y - 1
-	//app.SetPosition(newX, newY)
 }
 
 func 调整窗口位置_限定高度(window *application.WebviewWindow, 内容高度 int) {
@@ -670,11 +647,7 @@ func 检查更新() {
 		zenity.Title("软件更新"),
 		zenity.MaxValue(100), // 设置最大进度值为100
 	)
-	//for i := 1; i <= 100; i++ {
-	//	// 更新进度对话框的进度
-	//	progress.Value(i)
-	//	time.Sleep(100 * time.Millisecond) // 模拟任务执行时间
-	//}
+
 	progress.Text("正在下载...")
 
 	err = mymodel.E下载带进度回调(info.MacDownloadURL, 下载文件夹路径+"/qoq_MacOS.zip", func(进度 float64) {
