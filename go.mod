@@ -9,7 +9,7 @@ replace github.com/wailsapp/wails/v2 => ./wails/v2
 //replace github.com/duolabmeng6/goefun => /Users/chensuilong/Desktop/goproject/goefun
 
 require (
-	github.com/duolabmeng6/goefun v1.3.0
+	github.com/duolabmeng6/goefun v1.3.6
 	github.com/go-vgo/robotgo v0.100.10
 	github.com/ncruces/zenity v0.10.9
 	github.com/robotn/gohook v0.31.3

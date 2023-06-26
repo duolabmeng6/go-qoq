@@ -183,6 +183,7 @@ func E加载配置文件(dir string) bool {
 	G翻译接口.E注册服务("腾讯翻译", etranslation.New腾讯翻译(ecore.Env("腾讯翻译_App_id", ""), ecore.Env("腾讯翻译_Secret_key", "")))
 	G翻译接口.E注册服务("阿里云翻译", etranslation.New阿里云翻译(ecore.Env("阿里云翻译_App_id", ""), ecore.Env("阿里云翻译_Secret_key", "")))
 	G翻译接口.E注册服务("DeepL翻译", etranslation.NewDeepL翻译(ecore.Env("DeepL翻译_App_id", "")))
+	G翻译接口.E注册服务("OpenAI翻译", etranslation.NewOpenAI翻译("", ecore.Env("DeepL翻译_App_id", "")))
 
 	// 遍历 G翻译接口.E列出翻译模块() 把他加入 GConfig.E翻译服务列表
 	for _, v := range G翻译接口.E列出翻译模块和初始化参数() {
@@ -241,6 +242,7 @@ func E加载配置文件(dir string) bool {
 	G翻译接口.E注册服务("腾讯翻译", etranslation.New腾讯翻译(ecore.Env("腾讯翻译_App_id", ""), ecore.Env("腾讯翻译_Secret_key", "")))
 	G翻译接口.E注册服务("阿里云翻译", etranslation.New阿里云翻译(ecore.Env("阿里云翻译_App_id", ""), ecore.Env("阿里云翻译_Secret_key", "")))
 	G翻译接口.E注册服务("DeepL翻译", etranslation.NewDeepL翻译(ecore.Env("DeepL翻译_App_id", "")))
+	G翻译接口.E注册服务("OpenAI翻译", etranslation.NewOpenAI翻译(ecore.Env("OpenAI翻译_App_id", ""), ecore.Env("OpenAI翻译_Secret_key", "")))
 
 	//c := viper.AllSettings()
 	//ecore.E调试输出(c)

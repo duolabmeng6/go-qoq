@@ -138,7 +138,7 @@
                     <draggable :scroll-sensitivity="100" :force-fallback="true" handle=".chapter-item-sort"
                                animation="250"
                                v-model="翻译服务列表" :options="{ group: 'items' }" class="draggable-list"
-                               >
+                    >
                         <template v-for="item in 翻译服务列表">
                             <div class="grid grid-cols-4 gap-4" :key="item.id">
                                 <div class="w-1 p-4">
@@ -306,7 +306,20 @@
                     dthis.自动复制首个翻译结果 = data.自动复制首个翻译结果
                     dthis.点击翻译结果中的蓝色单词时将其复制 = data.点击翻译结果中的蓝色单词时将其复制
 
-                    this.翻译服务列表 = this.翻译服务列表.slice().sort((a, b) => a.order - b.order);
+                    // this.翻译服务列表 = this.翻译服务列表.slice().sort((a, b) => a.order - b.order);
+
+                    // 检查 for 翻译服务列表是否存在 OpenAI翻译 如果有检查  prompt 是否为空如果空则填上 Translate this into {目标语言}:\n\n{内容}\n\n
+                    for (var i = 0; i < dthis.翻译服务列表.length; i++) {
+                        console.log("log", dthis.翻译服务列表[i].name)
+                        if (dthis.翻译服务列表[i].name == "OpenAI翻译") {
+                            console.log("logokoko")
+                            console.log(dthis.翻译服务列表[i])
+                            if (dthis.翻译服务列表[i].app_id == "") {
+                                dthis.翻译服务列表[i].app_id = "Translate this into {目标语言}:\n\n{内容}\n\n"
+                            }
+                        }
+                    }
+
 
                     dthis.$forceUpdate();
 

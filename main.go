@@ -322,6 +322,10 @@ func main() {
 			if rtdata.Name == "DeepL翻译" {
 				x翻译接口.E注册服务("DeepL翻译", etranslation.NewDeepL翻译(rtdata.App_id))
 			}
+			if rtdata.Name == "OpenAI翻译" {
+				x翻译接口.E注册服务("OpenAI翻译", etranslation.NewOpenAI翻译(rtdata.App_id, rtdata.Secret_key))
+			}
+
 			翻译内容, _ := x翻译接口.E取翻译模块(rtdata.Name).E翻译("我是一个小可爱", "zh_CN", "en_US")
 			app.Events.Emit(&application.WailsEvent{
 				Name: action,
